@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     )
 
     tavily_api_key: str | None = Field(default=None, validation_alias="TAVILY_API_KEY")
+    offline_corpus_path: str = Field(
+        default="ai_agent_offline_research_corpus_v2/topics/01_single_agent_vs_multi_agent_architectures_for_complex_research_tasks.json",
+        validation_alias="OFFLINE_CORPUS_PATH",
+    )
 
     max_iterations: int = Field(default=6, ge=1, le=20, validation_alias="MAX_ITERATIONS")
     timeout_seconds: int = Field(default=60, ge=5, le=600, validation_alias="TIMEOUT_SECONDS")
