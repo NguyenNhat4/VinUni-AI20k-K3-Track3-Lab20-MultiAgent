@@ -1,7 +1,7 @@
 """Supervisor / router skeleton."""
 
 from multi_agent_research_lab.agents.base import BaseAgent
-from multi_agent_research_lab.core.errors import StudentTodoError
+from multi_agent_research_lab.core.config import get_settings
 from multi_agent_research_lab.core.state import ResearchState
 
 
@@ -19,4 +19,17 @@ class SupervisorAgent(BaseAgent):
         - Enforce max iterations and failure fallback.
         """
 
-        raise StudentTodoError("TODO(student): implement SupervisorAgent.run")
+        if state.final_answer:
+            route = "done"
+        elif state.iteration >= get_settings().max_iterations:
+            state.errors.append("maximum iterations reached")
+            route = "done"
+        elif not state.sources:
+            route = "researcher"
+        elif not state.analysis_notes:
+            route = "analyst"
+        else:
+            route = "writer"
+        state.record_route(route)
+        state.add_trace_event(self.name, {"next": route})
+        return state

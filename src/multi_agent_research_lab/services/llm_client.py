@@ -5,7 +5,7 @@ Production note: agents should depend on this interface instead of importing an 
 
 from dataclasses import dataclass
 
-from multi_agent_research_lab.core.errors import StudentTodoError
+from multi_agent_research_lab.core.config import get_settings
 
 
 @dataclass(frozen=True)
@@ -26,4 +26,22 @@ class LLMClient:
         Keep retry, timeout, and token logging here rather than inside agents.
         """
 
-        raise StudentTodoError("TODO(student): implement LLMClient.complete")
+        settings = get_settings()
+        if not settings.openai_api_key:
+            return LLMResponse(content=f"{user_prompt}\n\n(offline fallback)")
+        from openai import OpenAI
+
+        response = OpenAI(api_key=settings.openai_api_key).chat.completions.create(
+            model=settings.openai_model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            timeout=settings.timeout_seconds,
+        )
+        usage = response.usage
+        return LLMResponse(
+            content=response.choices[0].message.content or "",
+            input_tokens=usage.prompt_tokens if usage else None,
+            output_tokens=usage.completion_tokens if usage else None,
+        )

@@ -20,5 +20,14 @@ def run_benchmark(
     started = perf_counter()
     state = runner(query)
     latency = perf_counter() - started
-    metrics = BenchmarkMetrics(run_name=run_name, latency_seconds=latency)
+    answer = state.final_answer or ""
+    citations = sum(1 for index in range(1, len(state.sources) + 1) if f"[{index}]" in answer)
+    coverage = citations / len(state.sources) if state.sources else 0.0
+    metrics = BenchmarkMetrics(
+        run_name=run_name,
+        latency_seconds=latency,
+        citation_coverage=coverage,
+        failure_rate=1.0 if state.errors else 0.0,
+        notes="; ".join(state.errors),
+    )
     return state, metrics
