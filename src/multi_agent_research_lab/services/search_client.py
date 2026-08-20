@@ -50,7 +50,10 @@ class SearchClient:
                         (score, SourceDocument(
                             title=article.get("title", "Untitled"),
                             snippet=article.get("content", "")[:1200],
-                            metadata={"article_id": article.get("article_id"), "source": "offline_corpus"},
+                            metadata={
+                                "article_id": article.get("article_id"),
+                                "source": "offline_corpus",
+                            },
                         ))
                     )
             for document in knowledge_base.get("source_documents", []):
@@ -62,7 +65,10 @@ class SearchClient:
                             title=document.get("title", "Untitled"),
                             url=document.get("provenance_url"),
                             snippet=document.get("full_text", "")[:1200],
-                            metadata={"document_id": document.get("document_id"), "source": "offline_corpus"},
+                            metadata={
+                                "document_id": document.get("document_id"),
+                                "source": "offline_corpus",
+                            },
                         ))
                     )
             candidates.sort(key=lambda item: item[0], reverse=True)
